@@ -15,15 +15,16 @@ pipeline {
         }
 
         stage('Build & Test') {
-            steps {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install -r requirements.txt
-                    pytest --junitxml=test-results.xml
-                '''
-            }
-        }
+    steps {
+        sh '''
+            rm -rf venv
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pytest --junitxml=test-results.xml
+        '''
+    }
+}
 
         stage('SonarQube Analysis') {
             steps {
