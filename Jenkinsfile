@@ -27,16 +27,15 @@ pipeline {
 }
 
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('MySonarQube') {
-                    sh '''
-                        ${SCANNER_HOME:-/opt/sonar-scanner/bin}/sonar-scanner || \
-                        sonar-scanner
-                    '''
-                }
+    steps {
+        withSonarQubeEnv('MySonarQube') {
+            script {
+                def scannerHome = tool 'sonar-scanner'
+                sh "${scannerHome}/bin/sonar-scanner"
             }
         }
-
+    }
+}
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
