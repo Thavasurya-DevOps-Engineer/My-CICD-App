@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
-        IMAGE_NAME = "yourdockerhubusername/my-cicd-app"
+        IMAGE_NAME = "thavasurya/my-cicd-app"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
@@ -15,27 +15,28 @@ pipeline {
         }
 
         stage('Build & Test') {
-    steps {
-        sh '''
-            rm -rf venv
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-            pytest --junitxml=test-results.xml
-        '''
-    }
-}
-
-        stage('SonarQube Analysis') {
-    steps {
-        withSonarQubeEnv('MySonarQube') {
-            script {
-                def scannerHome = tool 'sonar-scanner'
-                sh "${scannerHome}/bin/sonar-scanner"
+            steps {
+                sh '''
+                    rm -rf venv
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    pytest --junitxml=test-results.xml
+                '''
             }
         }
-    }
-}
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('MySonarQube') {
+                    script {
+                        def scannerHome = tool 'sonar-scanner'
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
